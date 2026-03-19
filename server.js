@@ -9,36 +9,47 @@ app.use(express.json());
 
 const WEBHOOK = process.env.WEBHOOK;
 
+app.get("/", (req, res) => {
+  res.send("Backend działa ✅");
+});
+
 app.post("/send", async (req, res) => {
+  try {
 
-const { name, contactType, contactValue, project } = req.body;
+    const { name, contactType, contactValue, project } = req.body;
 
-if(!WEBHOOK){
-  return res.status(500).send("Brak webhooka");
-}
+    if (!WEBHOOK) {
+      return res.status(500).json({ error: "Brak webhooka" });
+    }
 
-await fetch(WEBHOOK, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({
-embeds: [{
-title: "Nowe zgłoszenie — Run Studio",
-color: 3447003,
-fields: [
-{ name: "Imię", value: name || "Brak" },
-{ name: "Typ kontaktu", value: contactType || "Brak" },
-{ name: "Kontakt", value: contactValue || "Brak" },
-{ name: "Projekt", value: project || "Brak" }
-],
-timestamp: new Date()
-}]
-})
+    await fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        embeds: [{
+          title: "📩 Nowe zgłoszenie — Run Studio",
+          color: 3447003,
+          fields: [
+            { name: "👤 Imię", value: name || "Brak" },
+            { name: "📞 Typ kontaktu", value: contactType || "Brak" },
+            { name: "🔗 Kontakt", value: contactValue || "Brak" },
+            { name: "📄 Projekt", value: project || "Brak" }
+          ],
+          timestamp: new Date()
+        }]
+      })
+    });
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("Błąd:", err);
+    res.status(500).json({ error: "Błąd serwera" });
+  }
 });
 
-res.json({ success: true });
+const PORT = process.env.PORT || 3000;
 
-});
-
-app.listen(3000, () => {
-console.log("Server działa");
+app.listen(PORT, () => {
+  console.log("Server działa na porcie " + PORT);
 });
