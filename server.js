@@ -14,42 +14,29 @@ app.get("/", (req, res) => {
 
 app.post("/send", async (req, res) => {
   try {
-
-    const { name, contactType, contactValue, project } = req.body;
-
     if (!WEBHOOK) {
       return res.status(500).json({ error: "Brak webhooka" });
     }
 
-const response = await fetch(WEBHOOK, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    content: "📩 NOWE ZGŁOSZENIE",
-    embeds: [{
-      title: "Run Studio",
-      color: 3447003,
-      fields: [
-        { name: "👤 Imię", value: name || "Brak" },
-        { name: "📞 Typ kontaktu", value: contactType || "Brak" },
-        { name: "🔗 Kontakt", value: contactValue || "Brak" },
-        { name: "📄 Projekt", value: project || "Brak" }
-      ]
-    }]
-  })
-});
+    const response = await fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: "🔥 TEST RUNSTUDIO DZIAŁA"
+      })
+    });
 
-const text = await response.text();
+    const text = await response.text();
+    console.log("DISCORD RESPONSE:", text);
 
-if (!response.ok) {
-  console.error("DISCORD ERROR:", text);
-  return res.status(500).json({ error: text });
-}
+    if (!response.ok) {
+      return res.status(500).json({ error: text });
+    }
 
     res.json({ success: true });
 
   } catch (err) {
-    console.error("Błąd:", err);
+    console.error("BŁĄD SERWERA:", err);
     res.status(500).json({ error: "Błąd serwera" });
   }
 });
